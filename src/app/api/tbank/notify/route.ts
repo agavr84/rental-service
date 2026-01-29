@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { buildTbankToken, resolveTbankStatus } from "@/lib/tbank";
 
@@ -59,6 +60,8 @@ export async function POST(req: Request) {
     where: { bookingId: booking.id },
   });
 
+  const rawWebhook = JSON.parse(JSON.stringify(payload)) as Prisma.JsonObject;
+
   if (existingPayment) {
     await prisma.payment.update({
       where: { id: existingPayment.id },
@@ -66,7 +69,7 @@ export async function POST(req: Request) {
         status,
         tbankPaymentId: paymentId ?? existingPayment.tbankPaymentId,
         amount: payload.Amount ? Number(payload.Amount) : existingPayment.amount,
-        rawWebhook: payload,
+        rawWebhook,
       },
     });
   } else {
@@ -76,7 +79,7 @@ export async function POST(req: Request) {
         amount: payload.Amount ? Number(payload.Amount) : booking.totalPrice * 100,
         status,
         tbankPaymentId: paymentId,
-        rawWebhook: payload,
+        rawWebhook,
         provider: "TBANK",
       },
     });
