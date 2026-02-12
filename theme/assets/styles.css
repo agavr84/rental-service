@@ -1212,6 +1212,14 @@ h3 {
   color: #3f4b45;
 }
 
+.home-description .house-content > p:first-child img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  border-radius: 16px;
+  display: block;
+}
+
 .search-page-results ul {
   list-style: none;
   margin: 0;
