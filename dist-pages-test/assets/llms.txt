@@ -1,0 +1,15 @@
+# Rental Service Website
+
+Статический сайт аренды домов и бань на Notepub.
+
+Base URL:
+- https://example.com/
+
+Preferred machine-readable source:
+- https://example.com/llms-full.txt
+
+Entry points:
+- Home: https://example.com/
+- Houses hub: https://example.com/houses/
+- Banyas hub: https://example.com/banyas/
+- Sitemap: https://example.com/sitemap.xml
