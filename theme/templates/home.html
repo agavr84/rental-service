@@ -80,9 +80,95 @@
     </div>
   </section>
 
+  <section id="snowmobile" class="section-block snowmobile-section space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-3xl font-semibold font-display">Снегоходные туры и аренда</h2>
+      <p class="text-base">Экстремальный зимний отдых с надежной техникой и сопровождением инструкторов.</p>
+    </div>
+
+    <div class="snowmobile-gallery">
+      <div class="snowmobile-photo glass-panel">
+        <img src="{{ .BaseURL }}/media/uploads/snow/1.webp" alt="Снегоход в зимнем туре" loading="lazy" decoding="async">
+      </div>
+      <div class="snowmobile-photo glass-panel">
+        <img src="{{ .BaseURL }}/media/uploads/snow/2.webp" alt="Снегоход в парке техники" loading="lazy" decoding="async">
+      </div>
+      <div class="snowmobile-photo glass-panel">
+        <img src="{{ .BaseURL }}/media/uploads/snow/3.webp" alt="Туристический снегоход Yamaha" loading="lazy" decoding="async">
+      </div>
+    </div>
+
+    <div class="snowmobile-pricing">
+      <div class="glass-panel snowmobile-card">
+        <h3 class="font-display">Почасовая аренда</h3>
+        <p class="snowmobile-price">от 5 000 ₽ / час / человек</p>
+        <p class="small-note">Минимальная цена за час аренды с человека.</p>
+      </div>
+      <div class="glass-panel snowmobile-card">
+        <h3 class="font-display">Туры от 2 часов</h3>
+        <p class="description">Идеально для первого знакомства со снегоходом и зимними маршрутами.</p>
+      </div>
+      <div class="glass-panel snowmobile-card">
+        <h3 class="font-display">Полный день (до суток)</h3>
+        <p class="description">Дальние маршруты, дикая природа и максимум впечатлений.</p>
+        <p class="small-note">Стоимость туров рассчитывается индивидуально.</p>
+      </div>
+    </div>
+
+    <div class="snowmobile-features">
+      <div class="glass-panel snowmobile-card">
+        <h3 class="font-display">Что включено</h3>
+        <ul class="snowmobile-list">
+          <li>Современные и обслуженные снегоходы</li>
+          <li>Инструктаж перед стартом</li>
+          <li>Сопровождение в туре</li>
+          <li>Проверенные маршруты: лес, поля, зимние трассы</li>
+        </ul>
+      </div>
+      <div class="glass-panel snowmobile-card">
+        <h3 class="font-display">Кому подойдет</h3>
+        <ul class="snowmobile-list">
+          <li>Любителям драйва и активного отдыха</li>
+          <li>Тем, кто хочет яркие выходные</li>
+          <li>Для компаний, тимбилдинга и корпоративных выездов</li>
+        </ul>
+      </div>
+      <div class="glass-panel snowmobile-card">
+        <h3 class="font-display">Почему выбирают нас</h3>
+        <ul class="snowmobile-list">
+          <li>Безопасность и профессионализм</li>
+          <li>Индивидуальный подход к группе</li>
+          <li>Маршрут под ваш запрос и уровень</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="glass-panel snowmobile-cta">
+      <div class="space-y-2">
+        <div class="text-xl font-semibold font-display">Готовы покорить зиму с ветерком?</div>
+        <p class="description">Забронируйте снегоходный тур по телефону или оставьте заявку.</p>
+      </div>
+      <div class="snowmobile-actions">
+        <a class="button-secondary" href="tel:+79224474477">+7 (922) 447 44 77</a>
+        <button type="button" class="button-primary" data-modal-open="contact">Оставить заявку</button>
+      </div>
+    </div>
+  </section>
+
   <section class="section-block home-description">
     <div class="glass-panel p-6 rounded-3xl house-content">
       {{ .Body }}
+      <button type="button" class="ctaButton" data-modal-open="contact">Оставить заявку</button>
+      <form data-lead-form data-endpoint="https://functions.yandexcloud.net/d4e951j5mp0de508vbrk" class="lead-form">
+        <label>Имя
+          <input type="text" name="name" placeholder="Ваше имя" required>
+        </label>
+        <label>Телефон
+          <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" required>
+        </label>
+        <button type="submit">Отправить</button>
+        <p data-lead-status>Введите имя и телефон.</p>
+      </form>
     </div>
   </section>
 
