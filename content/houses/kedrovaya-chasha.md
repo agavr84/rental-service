@@ -1,22 +1,17 @@
 ---
-id: b1
+type: article
 slug: kedrovaya-chasha
-type: banya
 title: "Кедровая чаша"
 description: "Баня для расслабления и мягкого прогрева."
-basePricePerNight: 2000
-maxGuests: 6
-priceUnit: "час"
-images:
-  - /uploads/banya1/1.webp
-  - /uploads/banya1/2.webp
-  - /uploads/banya1/3.webp
-  - /uploads/banya1/4.webp
-  - /uploads/banya1/5.webp
-  - /uploads/banya1/6.webp
-metaTitle: "Кедровая чаша — баня"
-metaDescription: "Теплая баня с расслабляющей атмосферой."
+hub:
+  - banyas
+favorite: true
+image: /media/uploads/banya1/1.webp
+order: 10
+guests: 6
+price: "2000 ₽"
 ---
+
 
 ### О бане
 

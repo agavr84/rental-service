@@ -1,0 +1,20 @@
+# Rental Service Website - Full LLM Index
+
+## Purpose
+Сайт-каталог домов и бань с формой заявки.
+
+## Source of truth
+- Markdown content in `content/`
+- Rendering rules in `rules.yaml`
+- Telegram lead function in `functions/telegram-lead/`
+
+## Routes
+- Home: https://example.com/
+- Houses: https://example.com/houses/
+- Banyas: https://example.com/banyas/
+- Search: https://example.com/search/
+
+## Discovery and indexing
+- Sitemap: https://example.com/sitemap.xml
+- Search JSON: https://example.com/search.json
+- LLM index: https://example.com/llms.txt

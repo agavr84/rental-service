@@ -1,27 +1,17 @@
 ---
-id: h3
+type: article
 slug: dom-vikinga
-type: house
 title: "Дом викинга"
 description: "Атмосферный дом для отдыха и камерных событий."
-basePricePerNight: 20000
-maxGuests: 20
-priceUnit: "сутки"
-images:
-  - /uploads/house3/1.webp
-  - /uploads/house3/2.webp
-  - /uploads/house3/3.webp
-  - /uploads/house3/4.webp
-  - /uploads/house3/5.webp
-  - /uploads/house3/6.webp
-  - /uploads/house3/7.webp
-  - /uploads/house3/8.webp
-  - /uploads/house3/9.webp
-  - /uploads/house3/10.webp
-  - /uploads/house3/11.webp
-metaTitle: "Дом викинга — атмосферный отдых"
-metaDescription: "Атмосферный дом для перезагрузки и отдыха в тишине."
+hub:
+  - houses
+favorite: true
+image: /media/uploads/house3/1.webp
+order: 30
+guests: 20
+price: "20000 ₽"
 ---
+
 
 ### О доме
 

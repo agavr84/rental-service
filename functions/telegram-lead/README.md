@@ -1,16 +1,20 @@
-# Telegram lead function (Yandex Cloud Functions)
+# Telegram Lead Function (Yandex Cloud Functions)
 
-## Env vars
-- TELEGRAM_BOT_TOKEN
-- TELEGRAM_CHAT_ID
+Sends lead form data to Telegram chat.
 
-## Deploy (пример)
+## Required environment variables
+
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_CHAT_ID`
+
+## Deploy example
+
 ```bash
 yc serverless function create --name telegram-lead
 
 yc serverless function version create \
   --function-name telegram-lead \
-  --runtime nodejs16 \
+  --runtime nodejs18 \
   --entrypoint index.handler \
   --memory 128m \
   --execution-timeout 5s \
@@ -20,11 +24,14 @@ yc serverless function version create \
 ```
 
 ## Test
+
 ```bash
 curl -X POST <FUNCTION_URL> \
   -H 'Content-Type: application/json' \
-  -d '{"name":"Иван","phone":"+7 (922) 447 44 77"}'
+  -d '{"name":"Иван","phone":"+7 (900) 000-00-00"}'
 ```
 
-## CORS
-Функция отвечает на OPTIONS и добавляет CORS‑заголовки для локального теста (`http://127.0.0.1:8080`).
+## Notes
+
+- Function handles `OPTIONS` (CORS preflight).
+- Current implementation allows all origins (`*`).

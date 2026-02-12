@@ -1,86 +1,61 @@
-# Посуточная аренда домов (Next.js + Postgres + T-Bank)
+# Rental Service (Notepub + Yandex Cloud Function)
 
-MVP для посуточной аренды: каталог домов и допов, подбор дат, создание бронирования, оплата через T-Bank, webhook обработка.
+Static rental catalog website powered by Notepub, deployed to GitHub Pages.
 
-## Стек
-- Node 22+
-- Next.js (App Router) + TypeScript
-- Postgres (локально)
-- Prisma ORM
-- T-Bank API `/v2/Init` + webhook
+Lead form submissions are sent to Telegram through a serverless function:
+- `functions/telegram-lead/`
 
-## Быстрый старт
+## Architecture
 
-1) Установите зависимости
+- Static site: Notepub build output (`dist/`)
+- Hosting: GitHub Pages (GitHub Actions)
+- Lead API: Yandex Cloud Function (HTTP endpoint)
+- No VPS required
+
+## Project structure
+
+- `content/` - markdown pages and media (`/media/*`)
+- `theme/` - templates and assets
+- `config.yaml`, `rules.yaml` - Notepub config
+- `scripts/build.sh` - local/CI build script
+- `.github/workflows/deploy.yml` - GitHub Pages deploy
+- `functions/telegram-lead/` - serverless lead endpoint
+
+## Local run
+
+1. Download `notepub` binary (recommended from release `v0.1.3`):
+
 ```bash
-npm install
+curl -L -o ./notepub "https://github.com/cookiespooky/notepub/releases/download/v0.1.3/notepub_darwin_arm64"
+chmod +x ./notepub
 ```
 
-2) Настройте переменные окружения
+2. Build:
+
 ```bash
-cp .env.example .env.local
+NOTEPUB_BIN=./notepub ./scripts/build.sh
 ```
 
-3) Запустите Postgres (Docker опционально)
+3. Serve:
+
 ```bash
-npm run db:up
+./notepub serve --config ./config.yaml --rules ./rules.yaml
 ```
 
-4) Примените миграции и наполните данными
-```bash
-npm run db:migrate
-npm run db:seed
-```
+Open `http://127.0.0.1:8080/`.
 
-5) Запустите приложение
-```bash
-npm run dev
-```
+## Deploy
 
-Откройте `http://localhost:3000`.
+- Push to `main`.
+- Workflow `Deploy Rental Site to GitHub Pages` builds and deploys `dist/`.
+- `base_url` and `media_base_url` are adjusted automatically for GitHub Pages.
 
-## Скрипты
-- `npm run dev` — запуск Next.js
-- `npm run db:up` — Postgres через Docker Compose
-- `npm run db:migrate` — миграции Prisma
-- `npm run db:seed` — сиды (5 домов + 3 допа)
+## Lead form
 
-## Переменные окружения
-Смотрите `.env.example`.
+- Frontend form is on `content/home.md`.
+- Endpoint URL is stored in form attribute `data-endpoint`.
+- Request payload:
+  - `name`
+  - `phone`
 
-- `DATABASE_URL` — подключение к Postgres
-- `PUBLIC_BASE_URL` — базовый URL для callback/payments
-- `TBANK_TERMINAL_KEY` — терминал ключ
-- `TBANK_PASSWORD` — пароль
-- `TBANK_INIT_URL` — URL для `/v2/Init`
-
-## Платежи и webhook локально
-
-### Вариант 1: ngrok
-1) Запустите `ngrok http 3000`
-2) Укажите `PUBLIC_BASE_URL` равным ngrok URL
-3) Обновите `.env.local` и перезапустите сервер
-
-### Вариант 2: ручной вызов webhook
-Отправьте POST на `http://localhost:3000/api/tbank/notify` с корректной подписью Token.
-
-Для формирования `Token` используйте правила T-Bank:
-- исключите поле `Token`
-- добавьте `Password`
-- отсортируйте ключи по алфавиту
-- склейте значения и посчитайте SHA-256
-
-## Основные эндпоинты API
-- `GET /api/meta`
-- `GET /api/availability?houseId&from&to`
-- `GET /api/available-houses?start&end`
-- `POST /api/booking/create-hold`
-- `POST /api/tbank/init`
-- `POST /api/tbank/notify`
-
-## Страницы
-- `/` — главная
-- `/search?start&end` — доступные дома
-- `/houses/[slug]` — страница дома
-- `/checkout/[bookingId]` — оплата
-- `/success` и `/fail` — результаты оплаты
+If needed, update endpoint in `content/home.md`.

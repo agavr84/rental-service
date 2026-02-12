@@ -1,0 +1,26 @@
+site:
+  id: default
+  base_url: "http://127.0.0.1:8080/"
+  media_base_url: "http://127.0.0.1:8080/media/"
+  title: "Барская усадьба"
+  description: "Посуточная аренда домов и бань на Барсовой горе."
+  default_og_image: "/media/default.webp"
+content:
+  source: "local"
+  local_dir: "./content"
+paths:
+  file_root: ./.notepub
+  artifacts_dir: ./.notepub/artifacts
+  snapshot_file: ./.notepub/snapshot/objects.json
+  cache_root: ./.notepub/cache
+theme:
+  dir: "."
+  name: "theme"
+  templates_subdir: "templates"
+  assets_subdir: "assets"
+rules_path: "./rules.yaml"
+server:
+  listen: "127.0.0.1:8080"
+cache:
+  html_ttl_seconds: 600
+  stale_if_error_seconds: 604800

@@ -1,22 +1,17 @@
 ---
-id: b2
+type: article
 slug: sosnovaya-chasha
-type: banya
 title: "Сосновая чаша"
 description: "Баня с ароматом хвои и спокойной атмосферой."
-basePricePerNight: 2000
-maxGuests: 6
-priceUnit: "час"
-images:
-  - /uploads/banya2/1.webp
-  - /uploads/banya2/2.webp
-  - /uploads/banya2/3.webp
-  - /uploads/banya2/4.webp
-  - /uploads/banya2/5.webp
-  - /uploads/banya2/6.webp
-metaTitle: "Сосновая чаша — баня"
-metaDescription: "Баня в сосновом окружении для полного восстановления."
+hub:
+  - banyas
+favorite: true
+image: /media/uploads/banya2/1.webp
+order: 20
+guests: 6
+price: "2000 ₽"
 ---
+
 
 ### О бане
 
