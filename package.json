@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
+    "build:static": "node scripts/build-static.js",
+    "build:local": "BASE_PATH=/ SITE_URL=http://localhost:8080 node scripts/build-static.js",
     "db:up": "docker compose up -d",
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
@@ -17,21 +15,10 @@
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
-    "date-fns": "3.6.0",
-    "dotenv": "^17.2.3",
-    "next": "15.5.2",
-    "react": "18.2.0",
-    "react-day-picker": "^8.10.1",
-    "react-dom": "18.2.0",
-    "react-imask": "^7.6.1"
+    "gray-matter": "^4.0.3",
+    "marked": "^14.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "18.2.66",
-    "@types/react-dom": "18.2.22",
-    "eslint": "8.57.0",
-    "eslint-config-next": "14.2.5",
-    "prisma": "5.22.0",
-    "typescript": "^5"
+    "prisma": "5.22.0"
   }
 }

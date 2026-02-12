@@ -1,0 +1,16 @@
+[
+  {
+    "id": "chan",
+    "title": "Чан",
+    "price": 2000,
+    "priceType": "PER_BOOKING",
+    "note": "за одну растопку"
+  },
+  {
+    "id": "banya-extra",
+    "title": "Дополнительное время бани",
+    "price": 1500,
+    "priceType": "PER_HOUR",
+    "note": "за час сверх 3 часов"
+  }
+]
