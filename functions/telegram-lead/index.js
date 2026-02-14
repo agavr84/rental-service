@@ -13,6 +13,7 @@ const sendTelegram = (token, chatId, text) =>
         hostname: "api.telegram.org",
         path: `/bot${token}/sendMessage`,
         method: "POST",
+        timeout: 10000,
         headers: {
           "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(payload),
@@ -22,16 +23,27 @@ const sendTelegram = (token, chatId, text) =>
         let data = "";
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => {
-          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-            resolve();
-          } else {
+          if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
             reject(new Error(data || "Telegram error"));
+            return;
+          }
+
+          try {
+            const parsed = data ? JSON.parse(data) : {};
+            if (parsed.ok === false) {
+              reject(new Error(parsed.description || "Telegram rejected message"));
+              return;
+            }
+            resolve();
+          } catch {
+            resolve();
           }
         });
       }
     );
 
     req.on("error", reject);
+    req.on("timeout", () => req.destroy(new Error("Telegram request timeout")));
     req.write(payload);
     req.end();
   });
