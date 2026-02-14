@@ -47,8 +47,29 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="icon" type="image/svg+xml" href="{{ .AssetsBase }}/notepub.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ .AssetsBase }}/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ .AssetsBase }}/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ .AssetsBase }}/favicon-16x16.png" />
+  <link rel="shortcut icon" href="{{ .AssetsBase }}/favicon.ico" />
+  <link rel="manifest" href="{{ .AssetsBase }}/site.webmanifest" />
   <link rel="stylesheet" href="{{ .AssetsBase }}/styles.css" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LodgingBusiness",
+      "name": "Барская усадьба",
+      "url": "{{ $pageURL }}",
+      "telephone": "+7 (922) 447 44 77",
+      "image": "{{ $ogImage }}",
+      "logo": "{{ .BaseURL }}/media/logo.webp",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Сургут",
+        "streetAddress": "ДНТ Зеленый бор, улица Белорусская, дом 1",
+        "addressCountry": "RU"
+      }
+    }
+  </script>
   <script>
     window.__notepubSearchMode = "{{ .SearchMode }}";
     window.__notepubBaseURL = "{{ .BaseURL }}";

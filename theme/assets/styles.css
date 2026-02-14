@@ -863,6 +863,7 @@ h3 {
   justify-content: space-between;
   gap: 2rem;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .footer .left {
@@ -971,6 +972,20 @@ h3 {
   align-self: flex-end;
 }
 
+.footer .madeWith {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 0.9rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: rgba(36, 66, 55, 0.8);
+  text-decoration: none;
+}
+
+.footer .madeWith:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 899px) {
   .header .phone {
     display: none;
@@ -1001,6 +1016,13 @@ h3 {
 
   .footer .docButton {
     align-self: center;
+  }
+
+  .footer .madeWith {
+    position: static;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.25rem;
   }
 }
 

@@ -3,13 +3,13 @@
 Статический сайт аренды домов и бань на Notepub.
 
 Base URL:
-- https://example.com/
+- /
 
 Preferred machine-readable source:
-- https://example.com/llms-full.txt
+- /llms-full.txt
 
 Entry points:
-- Home: https://example.com/
-- Houses hub: https://example.com/houses/
-- Banyas hub: https://example.com/banyas/
-- Sitemap: https://example.com/sitemap.xml
+- Home: /
+- Houses hub: /houses/
+- Banyas hub: /banyas/
+- Sitemap: /sitemap.xml

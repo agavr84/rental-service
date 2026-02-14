@@ -12,7 +12,7 @@
 
       <div class="gallery" data-gallery>
         <div class="hero">
-          <img src="{{ if .FM.image }}{{ .BaseURL }}/{{ .FM.image }}{{ else }}{{ .AssetsBase }}/placeholder.svg{{ end }}" alt="{{ .Page.Title }}" class="heroImage" data-gallery-hero>
+          <img src="{{ if .FM.image }}{{ .BaseURL }}/{{ .FM.image }}{{ else }}{{ .BaseURL }}/media/default.webp{{ end }}" alt="{{ .Page.Title }}" class="heroImage" data-gallery-hero>
         </div>
       </div>
 
@@ -40,7 +40,7 @@
       {{- range .Collections.related_items.Items }}
       <a href="{{ $.BaseURL }}{{ .Path }}" class="link">
         <div class="glass-panel card cardHover">
-          <div class="image" style="background-image: url('{{ if .FM.image }}{{ $.BaseURL }}/{{ .FM.image }}{{ else }}{{ $.AssetsBase }}/placeholder.svg{{ end }}')"></div>
+          <div class="image" style="background-image: url('{{ if .FM.image }}{{ $.BaseURL }}/{{ .FM.image }}{{ else }}{{ $.BaseURL }}/media/default.webp{{ end }}')"></div>
           <div class="content">
             <h3 class="text-xl font-semibold font-display">{{ .Title }}</h3>
             {{- if .Description }}<p class="description">{{ .Description }}</p>{{- end }}

@@ -42,7 +42,7 @@
       var title = item.title || '';
       var path = withBasePath(item.path || '');
       var snippet = item.snippet || '';
-      var thumb = item.image || item.thumbnail || '/assets/placeholder.svg';
+      var thumb = item.image || item.thumbnail || '/media/default.webp';
       if (!/^https?:\/\//.test(thumb)) thumb = withBasePath(thumb);
       html += '<li><a class="search-item-card" href="' + path + '">';
       html += '<img class="search-item-thumb" src="' + thumb + '" alt="" loading="lazy" decoding="async">';
