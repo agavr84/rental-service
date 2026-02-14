@@ -1,6 +1,29 @@
 (() => {
   const leadEndpoint = document.body?.getAttribute("data-lead-endpoint") || "";
   const leadSuccess = document.body?.getAttribute("data-lead-success") || "Спасибо!";
+  const normalizePhoneDigits = (value) => {
+    const digits = String(value || "").replace(/\D/g, "");
+    if (!digits) return "";
+    if (digits[0] === "8") return `7${digits.slice(1)}`.slice(0, 11);
+    if (digits[0] !== "7") return `7${digits}`.slice(0, 11);
+    return digits.slice(0, 11);
+  };
+
+  const formatPhone = (value) => {
+    const digits = normalizePhoneDigits(value);
+    if (!digits) return "";
+    const rest = digits.slice(1);
+
+    let result = "+7";
+    if (rest.length > 0) {
+      result += ` (${rest.slice(0, 3)}`;
+      if (rest.length >= 3) result += ")";
+    }
+    if (rest.length > 3) result += ` ${rest.slice(3, 6)}`;
+    if (rest.length > 6) result += `-${rest.slice(6, 8)}`;
+    if (rest.length > 8) result += `-${rest.slice(8, 10)}`;
+    return result;
+  };
 
   const openButtons = document.querySelectorAll("[data-modal-open]");
   const closeButtons = document.querySelectorAll("[data-modal-close]");
@@ -60,6 +83,24 @@
   const leadForms = document.querySelectorAll("form[data-lead-form]");
   leadForms.forEach((form) => {
     const status = form.querySelector("[data-lead-status]");
+    const phoneInput = form.querySelector('input[name="phone"]');
+
+    if (phoneInput instanceof HTMLInputElement) {
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = formatPhone(phoneInput.value);
+      });
+      phoneInput.addEventListener("focus", () => {
+        if (!phoneInput.value.trim()) {
+          phoneInput.value = "+7 (";
+        }
+      });
+      phoneInput.addEventListener("blur", () => {
+        if (phoneInput.value === "+7" || phoneInput.value === "+7 (") {
+          phoneInput.value = "";
+        }
+      });
+    }
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!leadEndpoint) {
@@ -68,10 +109,18 @@
       }
       const formData = new FormData(form);
       const name = String(formData.get("name") || "").trim();
-      const phone = String(formData.get("phone") || "").trim();
+      const phone = formatPhone(String(formData.get("phone") || "").trim());
+      const phoneDigits = normalizePhoneDigits(phone);
       if (!name || !phone) {
         if (status) status.textContent = "Заполните имя и телефон.";
         return;
+      }
+      if (phoneDigits.length !== 11) {
+        if (status) status.textContent = "Введите корректный телефон.";
+        return;
+      }
+      if (phoneInput instanceof HTMLInputElement) {
+        phoneInput.value = phone;
       }
       if (status) status.textContent = "Отправляем...";
       try {

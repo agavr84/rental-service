@@ -1039,9 +1039,15 @@ h3 {
   margin: 0;
 }
 
+.modalSubtitle {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  color: #59645f;
+}
+
 .modalPhone {
   display: inline-block;
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
   color: #244237;
   font-weight: 600;
   text-decoration: none;
