@@ -4,7 +4,7 @@
       <h1 class="title">{{ .Page.Title }}</h1>
       <div class="flex gap-3 items-center">
         {{- if .FM.guests }}<p class="subtitle badge">до {{ .FM.guests }} гостей</p>{{- end }}
-        {{- if .FM.price }}<p class="subtitle badge">{{ .FM.price }}</p>{{- end }}
+        {{- if .FM.price }}<p class="subtitle badge">от {{ .FM.price }}</p>{{- end }}
       </div>
       {{- if .Page.Description }}
       <p class="description">{{ .Page.Description }}</p>
@@ -23,7 +23,7 @@
       {{- if .FM.price }}
       <div>
         <div class="priceLabel">Стоимость за сутки</div>
-        <div class="priceValue">{{ .FM.price }}</div>
+        <div class="priceValue">от {{ .FM.price }}</div>
       </div>
       {{- end }}
       {{- if .FM.guests }}
