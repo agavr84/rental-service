@@ -978,6 +978,7 @@ h3 {
   bottom: 0.9rem;
   font-size: 0.75rem;
   line-height: 1.2;
+  padding: 0.55rem 1.1rem;
   color: rgba(36, 66, 55, 0.8);
   text-decoration: none;
 }
@@ -1023,6 +1024,7 @@ h3 {
     width: 100%;
     text-align: center;
     margin-top: 0.25rem;
+    padding: 0;
   }
 }
 
