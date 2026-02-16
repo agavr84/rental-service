@@ -5,6 +5,7 @@ const MIN_FORM_FILL_MS = Number(process.env.MIN_FORM_FILL_MS || 1500);
 const MAX_FORM_FILL_MS = Number(process.env.MAX_FORM_FILL_MS || 2 * 60 * 60 * 1000);
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60 * 1000);
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 8);
+const ENABLE_ERROR_REPORTING = String(process.env.ENABLE_ERROR_REPORTING || "true").toLowerCase() !== "false";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((item) => item.trim())
@@ -170,11 +171,30 @@ const parseBody = (event) => {
 };
 
 exports.handler = async (event) => {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const alertChatId = process.env.TELEGRAM_ALERT_CHAT_ID || chatId;
+  let errorNotified = false;
+  const notifyError = async (title, details = "") => {
+    if (errorNotified || !ENABLE_ERROR_REPORTING) return;
+    if (!token || !alertChatId) return;
+    errorNotified = true;
+    const safeTitle = String(title || "Error").slice(0, 120);
+    const safeDetails = String(details || "").replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 2000);
+    const text = `⚠️ Lead endpoint error\n${safeTitle}${safeDetails ? `\n${safeDetails}` : ""}`;
+    try {
+      await sendTelegram(token, alertChatId, text);
+    } catch {
+      // Intentionally swallow to avoid reporting loops.
+    }
+  };
+
   if (!allowedOrigins.length) {
+    await notifyError("Missing ALLOWED_ORIGINS configuration");
     return {
       statusCode: 500,
       headers: {},
-      body: "Missing ALLOWED_ORIGINS configuration",
+      body: "Internal error",
     };
   }
 
@@ -256,14 +276,12 @@ exports.handler = async (event) => {
     };
   }
 
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
   if (!token || !chatId) {
+    await notifyError("Missing Telegram configuration");
     return {
       statusCode: 500,
       headers: corsHeaders,
-      body: "Missing Telegram configuration",
+      body: "Internal error",
     };
   }
 
@@ -281,11 +299,15 @@ exports.handler = async (event) => {
       headers: corsHeaders,
       body: "OK",
     };
-  } catch (error) {
+  } catch {
+    await notifyError(
+      "Telegram send failed",
+      `origin=${origin || "n/a"} ip=${clientIp || "n/a"}`
+    );
     return {
       statusCode: 502,
       headers: corsHeaders,
-      body: "Telegram error",
+      body: "Temporary error",
     };
   }
 };

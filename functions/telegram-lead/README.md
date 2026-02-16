@@ -12,6 +12,8 @@ Sends lead form data to Telegram chat.
 
 ## Recommended environment variables
 
+- `TELEGRAM_ALERT_CHAT_ID` - optional chat id for error notifications. If omitted, uses `TELEGRAM_CHAT_ID`.
+- `ENABLE_ERROR_REPORTING` - set to `false` to disable sending endpoint errors to Telegram.
 - `MIN_FORM_FILL_MS` - minimum form fill time in ms (default `1500`).
 - `MAX_FORM_FILL_MS` - maximum accepted form age in ms (default `7200000`).
 - `RATE_LIMIT_WINDOW_MS` - rate-limit window in ms (default `60000`).
