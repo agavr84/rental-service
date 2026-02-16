@@ -1176,6 +1176,20 @@ h3 {
   gap: 1rem;
 }
 
+.hp-wrap {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.hp-input {
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
 .field {
   display: flex;
   flex-direction: column;

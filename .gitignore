@@ -3,4 +3,6 @@
 .env.local
 .notepub/
 dist/
+dist-pages-test/
 node_modules/
+notepub

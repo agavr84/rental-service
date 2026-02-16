@@ -105,6 +105,11 @@
     const status = form.querySelector("[data-lead-status]");
     const phoneInput = form.querySelector('input[name="phone"]');
     const privacyInput = form.querySelector('input[name="privacy"]');
+    const startedAtInput = form.querySelector('input[name="startedAt"]');
+
+    if (startedAtInput instanceof HTMLInputElement && !startedAtInput.value) {
+      startedAtInput.value = String(Date.now());
+    }
 
     if (phoneInput instanceof HTMLInputElement) {
       phoneInput.addEventListener("keydown", (event) => {
@@ -162,6 +167,8 @@
       const formData = new FormData(form);
       const name = String(formData.get("name") || "").trim();
       const phone = formatPhone(String(formData.get("phone") || "").trim());
+      const company = String(formData.get("company") || "").trim();
+      const startedAt = Number(formData.get("startedAt") || 0);
       const phoneDigits = normalizePhoneDigits(phone);
       if (!name || !phone) {
         if (status) status.textContent = "Заполните имя и телефон.";
@@ -175,6 +182,10 @@
         if (status) status.textContent = "Подтвердите согласие с политикой конфиденциальности.";
         return;
       }
+      if (!startedAt) {
+        if (status) status.textContent = "Обновите страницу и попробуйте снова.";
+        return;
+      }
       if (phoneInput instanceof HTMLInputElement) {
         phoneInput.value = phone;
       }
@@ -183,13 +194,16 @@
         const response = await fetch(leadEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, phone }),
+          body: JSON.stringify({ name, phone, company, startedAt }),
         });
         if (!response.ok) {
           throw new Error("Bad response");
         }
         if (status) status.textContent = leadSuccess;
         form.reset();
+        if (startedAtInput instanceof HTMLInputElement) {
+          startedAtInput.value = String(Date.now());
+        }
       } catch {
         if (status) status.textContent = "Не удалось отправить. Попробуйте ещё раз.";
       }

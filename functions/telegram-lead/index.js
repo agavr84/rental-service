@@ -1,5 +1,23 @@
 const https = require("node:https");
 
+const MAX_BODY_BYTES = 4096;
+const MIN_FORM_FILL_MS = Number(process.env.MIN_FORM_FILL_MS || 1500);
+const MAX_FORM_FILL_MS = Number(process.env.MAX_FORM_FILL_MS || 2 * 60 * 60 * 1000);
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60 * 1000);
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 8);
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai",
+  "https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai",
+  "https://барскаяусадьба.рф",
+  "https://www.барскаяусадьба.рф",
+];
+const allowedOrigins = (
+  process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",").map((item) => item.trim())
+    : DEFAULT_ALLOWED_ORIGINS
+).filter(Boolean);
+const rateBuckets = new Map();
+
 const sendTelegram = (token, chatId, text) =>
   new Promise((resolve, reject) => {
     const payload = JSON.stringify({
@@ -48,16 +66,90 @@ const sendTelegram = (token, chatId, text) =>
     req.end();
   });
 
+const getHeader = (headers, name) => {
+  if (!headers) return "";
+  const target = String(name || "").toLowerCase();
+  for (const [key, value] of Object.entries(headers)) {
+    if (String(key).toLowerCase() === target) {
+      return Array.isArray(value) ? String(value[0] || "") : String(value || "");
+    }
+  }
+  return "";
+};
+
+const getClientIp = (event) => {
+  const forwarded = getHeader(event.headers, "x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  const realIp = getHeader(event.headers, "x-real-ip");
+  if (realIp) return realIp.trim();
+  return "unknown";
+};
+
+const makeCorsHeaders = (origin, isAllowed) => {
+  const headers = {
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
+
+  if (isAllowed && origin) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+
+  return headers;
+};
+
+const isRateLimited = (key) => {
+  const now = Date.now();
+  const bucket = rateBuckets.get(key);
+  if (!bucket || now > bucket.resetAt) {
+    rateBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (bucket.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  bucket.count += 1;
+  return false;
+};
+
+const normalizePhoneDigits = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits[0] === "8") return `7${digits.slice(1)}`.slice(0, 11);
+  if (digits[0] !== "7") return `7${digits}`.slice(0, 11);
+  return digits.slice(0, 11);
+};
+
+const sanitizeName = (value) =>
+  String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const sanitizePhone = (value) =>
+  String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 const parseBody = (event) => {
   if (!event.body) return {};
+  if (event.body.length > MAX_BODY_BYTES * 2) return {};
   if (event.isBase64Encoded) {
-    const decoded = Buffer.from(event.body, "base64").toString("utf8");
+    const decodedBuffer = Buffer.from(event.body, "base64");
+    if (decodedBuffer.length > MAX_BODY_BYTES) return {};
+    const decoded = decodedBuffer.toString("utf8");
     try {
       return JSON.parse(decoded);
     } catch {
       return {};
     }
   }
+  if (Buffer.byteLength(event.body, "utf8") > MAX_BODY_BYTES) return {};
   try {
     return JSON.parse(event.body);
   } catch {
@@ -66,17 +158,23 @@ const parseBody = (event) => {
 };
 
 exports.handler = async (event) => {
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
+  const origin = getHeader(event.headers, "origin");
+  const originAllowed = !!origin && allowedOrigins.includes(origin);
+  const corsHeaders = makeCorsHeaders(origin, originAllowed);
 
   if (event.httpMethod === "OPTIONS") {
     return {
-      statusCode: 200,
+      statusCode: originAllowed ? 200 : 403,
       headers: corsHeaders,
       body: "",
+    };
+  }
+
+  if (!originAllowed) {
+    return {
+      statusCode: 403,
+      headers: corsHeaders,
+      body: "Forbidden",
     };
   }
 
@@ -88,12 +186,52 @@ exports.handler = async (event) => {
     };
   }
 
-  const { name, phone } = parseBody(event);
-  if (!name || !phone) {
+  const clientIp = getClientIp(event);
+  if (isRateLimited(clientIp)) {
+    return {
+      statusCode: 429,
+      headers: corsHeaders,
+      body: "Too Many Requests",
+    };
+  }
+
+  const body = parseBody(event);
+  const company = String(body.company || "").trim();
+  if (company) {
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: "OK",
+    };
+  }
+
+  const startedAt = Number(body.startedAt || 0);
+  const filledForMs = Date.now() - startedAt;
+  if (!startedAt || !Number.isFinite(startedAt) || filledForMs < MIN_FORM_FILL_MS || filledForMs > MAX_FORM_FILL_MS) {
     return {
       statusCode: 400,
       headers: corsHeaders,
-      body: "Missing name or phone",
+      body: "Invalid form timing",
+    };
+  }
+
+  const name = sanitizeName(body.name);
+  const phone = sanitizePhone(body.phone);
+  const phoneDigits = normalizePhoneDigits(phone);
+
+  if (!name || name.length < 2 || name.length > 80) {
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: "Invalid name",
+    };
+  }
+
+  if (phoneDigits.length !== 11) {
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: "Invalid phone",
     };
   }
 
@@ -121,7 +259,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 502,
       headers: corsHeaders,
-      body: error.message || "Telegram error",
+      body: "Telegram error",
     };
   }
 };

@@ -7,6 +7,16 @@ Sends lead form data to Telegram chat.
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
 
+## Recommended environment variables
+
+- `ALLOWED_ORIGINS` - comma-separated list of allowed Origins for CORS.
+  Example:
+  `https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai,https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai`
+- `MIN_FORM_FILL_MS` - minimum form fill time in ms (default `1500`).
+- `MAX_FORM_FILL_MS` - maximum accepted form age in ms (default `7200000`).
+- `RATE_LIMIT_WINDOW_MS` - rate-limit window in ms (default `60000`).
+- `RATE_LIMIT_MAX` - max requests per window per IP (default `8`).
+
 ## Deploy example
 
 ```bash
