@@ -36,12 +36,17 @@ jobs:
 
       - name: Prepare base_url for GitHub Pages
         run: |
-          OWNER="${GITHUB_REPOSITORY_OWNER}"
-          REPO="${GITHUB_REPOSITORY#*/}"
-          if [ "$REPO" = "${OWNER}.github.io" ]; then
-            BASE_URL="https://${OWNER}.github.io/"
+          if [ -f ./CNAME ]; then
+            DOMAIN="$(head -n 1 ./CNAME | tr -d '[:space:]')"
+            BASE_URL="https://${DOMAIN}/"
           else
-            BASE_URL="https://${OWNER}.github.io/${REPO}/"
+            OWNER="${GITHUB_REPOSITORY_OWNER}"
+            REPO="${GITHUB_REPOSITORY#*/}"
+            if [ "$REPO" = "${OWNER}.github.io" ]; then
+              BASE_URL="https://${OWNER}.github.io/"
+            else
+              BASE_URL="https://${OWNER}.github.io/${REPO}/"
+            fi
           fi
           MEDIA_BASE_URL="${BASE_URL}media/"
           echo "Using BASE_URL=$BASE_URL"
@@ -52,6 +57,9 @@ jobs:
         run: |
           chmod +x ./scripts/build.sh
           ./scripts/build.sh
+          if [ -f ./CNAME ]; then
+            cp ./CNAME ./dist/CNAME
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
