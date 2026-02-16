@@ -6,18 +6,20 @@ const MAX_FORM_FILL_MS = Number(process.env.MAX_FORM_FILL_MS || 2 * 60 * 60 * 10
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60 * 1000);
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 8);
 const ENABLE_ERROR_REPORTING = String(process.env.ENABLE_ERROR_REPORTING || "true").toLowerCase() !== "false";
+const SITE_DOMAIN = process.env.SITE_DOMAIN || "барскаяусадьба.рф";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((item) => item.trim())
   .filter(Boolean);
 const rateBuckets = new Map();
 
-const sendTelegram = (token, chatId, text) =>
+const sendTelegram = (token, chatId, text, parseMode = "HTML") =>
   new Promise((resolve, reject) => {
     const payload = JSON.stringify({
       chat_id: chatId,
       text,
       disable_web_page_preview: true,
+      parse_mode: parseMode,
     });
 
     const req = https.request(
@@ -118,6 +120,14 @@ const normalizePhoneDigits = (value) => {
   return digits.slice(0, 11);
 };
 
+const escapeHtml = (value) =>
+  String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 const sanitizeName = (value) =>
   String(value || "")
     .replace(/[\u0000-\u001F\u007F]/g, " ")
@@ -170,6 +180,18 @@ const parseBody = (event) => {
   }
 };
 
+const formatLeadMessage = ({ name, phone, queryParams }) => {
+  const phoneDigits = normalizePhoneDigits(phone);
+  const phoneHref = phoneDigits ? `tel:+${phoneDigits}` : "";
+  const paramsText = Object.keys(queryParams).length
+    ? `\n\nПараметры:\n${Object.entries(queryParams)
+        .map(([key, value]) => `${escapeHtml(key)}: ${escapeHtml(value)}`)
+        .join("\n")}`
+    : "";
+
+  return `<b>Новая заявка на сайте ${escapeHtml(SITE_DOMAIN)}</b>\n\nИмя: ${escapeHtml(name)}\nТелефон: <a href="${escapeHtml(phoneHref)}">${escapeHtml(phone)}</a>${paramsText}`;
+};
+
 exports.handler = async (event) => {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -181,7 +203,7 @@ exports.handler = async (event) => {
     errorNotified = true;
     const safeTitle = String(title || "Error").slice(0, 120);
     const safeDetails = String(details || "").replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 2000);
-    const text = `⚠️ Lead endpoint error\n${safeTitle}${safeDetails ? `\n${safeDetails}` : ""}`;
+    const text = `⚠️ Lead endpoint error\n${escapeHtml(safeTitle)}${safeDetails ? `\n${escapeHtml(safeDetails)}` : ""}`;
     try {
       await sendTelegram(token, alertChatId, text);
     } catch {
@@ -285,12 +307,7 @@ exports.handler = async (event) => {
     };
   }
 
-  const queryText = Object.keys(queryParams).length
-    ? `\nПараметры:\n${Object.entries(queryParams)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("\n")}`
-    : "";
-  const text = `Новая заявка\nИмя: ${name}\nТелефон: ${phone}${queryText}`;
+  const text = formatLeadMessage({ name, phone, queryParams });
 
   try {
     await sendTelegram(token, chatId, text);
