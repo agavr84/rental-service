@@ -79,7 +79,6 @@ button {
   text-decoration: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
 }
 
 .button-primary:hover {
@@ -94,6 +93,12 @@ button {
   padding: 0.65rem 1.2rem;
   border-radius: 999px;
   font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(36, 66, 55, 0.2);
 }
 
 .badge {
@@ -354,7 +359,7 @@ h3 {
 }
 
 .section-block {
-  margin-top: 4rem;
+  margin-top: 6rem;
 }
 
 .section-block:first-child {
@@ -362,7 +367,7 @@ h3 {
 }
 
 .container-shell > .section-block + .section-block {
-  margin-top: 4rem;
+  margin-top: 6rem;
 }
 
 .hero-panel {
@@ -371,10 +376,14 @@ h3 {
   padding: 2.5rem;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(136, 163, 143, 0.35), transparent 50%),
-    radial-gradient(circle at 85% 20%, rgba(36, 66, 55, 0.25), transparent 45%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(246, 241, 231, 0.85));
-  border: 1px solid rgba(36, 66, 55, 0.12);
+    radial-gradient(circle at top left, rgba(136, 163, 143, 0.25), transparent 50%),
+    radial-gradient(circle at 85% 20%, rgba(36, 66, 55, 0.01), transparent 45%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(246, 241, 231, 0.55)),
+    url("./barsovagora.webp");
+  background-size: auto, auto, auto, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  border: none;
   box-shadow: 0 24px 60px rgba(28, 31, 26, 0.12);
 }
 
@@ -447,14 +456,6 @@ h3 {
   line-height: 1.4;
 }
 
-#houses {
-  margin-top: 30px;
-}
-
-#extras {
-  margin-top: 70px;
-}
-
 .house-grid {
   display: grid;
   gap: 1.5rem;
@@ -514,6 +515,10 @@ h3 {
 @media (min-width: 1024px) {
   .lg\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-panel {
+    padding: 6rem 2.5rem;
   }
 
   .hero-grid {
@@ -756,6 +761,14 @@ h3 {
   .hero {
     aspect-ratio: 3 / 2;
   }
+
+  .priceCard {
+    text-align: center;
+  }
+
+  .priceCard .button-primary {
+    width: 100%;
+  }
 }
 
 /* Header */
@@ -842,6 +855,17 @@ h3 {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.header .ctaLabel {
+  display: inline;
+}
+
+.header .ctaIcon {
+  display: none;
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+}
+
 .header .ctaButton:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(36, 66, 55, 0.2);
@@ -849,7 +873,7 @@ h3 {
 
 /* Footer */
 .footer {
-  margin-top: 4rem;
+  margin-top: 2rem;
   border-top: 1px solid rgba(36, 66, 55, 0.12);
   background: rgba(246, 241, 231, 0.6);
 }
@@ -968,9 +992,10 @@ h3 {
   border-radius: 999px;
   padding: 0.55rem 1.1rem;
   font-size: 0.85rem;
-  cursor: not-allowed;
+  cursor: pointer;
   width: fit-content;
   align-self: flex-end;
+  text-decoration: none;
 }
 
 .footer .madeWith {
@@ -989,13 +1014,52 @@ h3 {
 }
 
 @media (max-width: 899px) {
+  .hero-copy {
+    text-align: center;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-actions button,
+  .hero-actions a {
+    width: 100%;
+  }
+
+  .cta-copy {
+    text-align: center;
+  }
+
+  .cta-actions {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .cta-actions button,
+  .cta-actions a {
+    width: 100%;
+  }
+
   .header .phone {
     display: none;
   }
 
   .header .ctaButton {
-    padding: 0.65rem 1.1rem;
-    font-size: 0.95rem;
+    padding: 0.65rem;
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header .ctaLabel {
+    display: none;
+  }
+
+  .header .ctaIcon {
+    display: inline-flex;
   }
 
   .footer .inner {
@@ -1039,6 +1103,9 @@ h3 {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .modal {
@@ -1048,6 +1115,21 @@ h3 {
   padding: 1.5rem;
   box-shadow: 0 24px 40px rgba(28, 31, 26, 0.2);
   border: 1px solid rgba(36, 66, 55, 0.15);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.modal-overlay.is-hidden {
+  display: flex;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.modal-overlay.is-hidden .modal {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
 }
 
 .modalHeader {
@@ -1110,6 +1192,35 @@ h3 {
   border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
+}
+
+.consent-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.88rem;
+  color: #3f4b45;
+  line-height: 1.4;
+}
+
+.consent-checkbox {
+  margin-top: 0.08rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: #244237;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.consent-text {
+  min-width: 0;
+}
+
+.consent-link {
+  color: #244237;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .submitButton {
@@ -1177,6 +1288,8 @@ h3 {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.8rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .cta-phone:hover {

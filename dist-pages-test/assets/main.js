@@ -1,6 +1,49 @@
 (() => {
   const leadEndpoint = document.body?.getAttribute("data-lead-endpoint") || "";
   const leadSuccess = document.body?.getAttribute("data-lead-success") || "Спасибо!";
+  const normalizePhoneDigits = (value) => {
+    const digits = String(value || "").replace(/\D/g, "");
+    if (!digits) return "";
+    if (digits[0] === "8") return `7${digits.slice(1)}`.slice(0, 11);
+    if (digits[0] !== "7") return `7${digits}`.slice(0, 11);
+    return digits.slice(0, 11);
+  };
+
+  const formatPhone = (value) => {
+    const digits = normalizePhoneDigits(value);
+    if (!digits) return "";
+    const rest = digits.slice(1);
+
+    let result = "+7";
+    if (rest.length > 0) {
+      result += ` (${rest.slice(0, 3)}`;
+      if (rest.length >= 3) result += ")";
+    }
+    if (rest.length > 3) result += ` ${rest.slice(3, 6)}`;
+    if (rest.length > 6) result += `-${rest.slice(6, 8)}`;
+    if (rest.length > 8) result += `-${rest.slice(8, 10)}`;
+    return result;
+  };
+
+  const countDigitsBeforeIndex = (value, index) =>
+    value.slice(0, Math.max(0, index)).replace(/\D/g, "").length;
+
+  const caretIndexFromDigits = (value, digitsCount) => {
+    if (digitsCount <= 0) return 0;
+    let seen = 0;
+    for (let i = 0; i < value.length; i += 1) {
+      if (/\d/.test(value[i])) {
+        seen += 1;
+        if (seen === digitsCount) return i + 1;
+      }
+    }
+    return value.length;
+  };
+
+  const removeDigitAt = (digits, index) => {
+    if (index < 0 || index >= digits.length) return digits;
+    return `${digits.slice(0, index)}${digits.slice(index + 1)}`;
+  };
 
   const openButtons = document.querySelectorAll("[data-modal-open]");
   const closeButtons = document.querySelectorAll("[data-modal-close]");
@@ -60,6 +103,55 @@
   const leadForms = document.querySelectorAll("form[data-lead-form]");
   leadForms.forEach((form) => {
     const status = form.querySelector("[data-lead-status]");
+    const phoneInput = form.querySelector('input[name="phone"]');
+
+    if (phoneInput instanceof HTMLInputElement) {
+      phoneInput.addEventListener("keydown", (event) => {
+        if (event.key !== "Backspace") return;
+        const start = phoneInput.selectionStart ?? 0;
+        const end = phoneInput.selectionEnd ?? start;
+        if (start !== end || start <= 0) return;
+
+        const value = phoneInput.value;
+        const leftChar = value[start - 1];
+        if (/\d/.test(leftChar)) return;
+
+        const digits = normalizePhoneDigits(value);
+        const digitsBeforeCursor = countDigitsBeforeIndex(value, start);
+        if (digitsBeforeCursor <= 0) return;
+
+        event.preventDefault();
+        const removeIndex = digitsBeforeCursor - 1;
+        const nextDigits = removeDigitAt(digits, removeIndex);
+        const formatted = formatPhone(nextDigits);
+        phoneInput.value = formatted;
+        const nextCaret = caretIndexFromDigits(formatted, removeIndex);
+        phoneInput.setSelectionRange(nextCaret, nextCaret);
+      });
+
+      phoneInput.addEventListener("input", () => {
+        const rawValue = phoneInput.value;
+        const start = phoneInput.selectionStart ?? rawValue.length;
+        const digitsBeforeCursor = countDigitsBeforeIndex(rawValue, start);
+        const formatted = formatPhone(rawValue);
+        phoneInput.value = formatted;
+        const nextCaret = caretIndexFromDigits(formatted, digitsBeforeCursor);
+        phoneInput.setSelectionRange(nextCaret, nextCaret);
+      });
+      phoneInput.addEventListener("focus", () => {
+        if (!phoneInput.value.trim()) {
+          phoneInput.value = "+7 (";
+          const end = phoneInput.value.length;
+          phoneInput.setSelectionRange(end, end);
+        }
+      });
+      phoneInput.addEventListener("blur", () => {
+        if (phoneInput.value === "+7" || phoneInput.value === "+7 (") {
+          phoneInput.value = "";
+        }
+      });
+    }
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!leadEndpoint) {
@@ -68,10 +160,18 @@
       }
       const formData = new FormData(form);
       const name = String(formData.get("name") || "").trim();
-      const phone = String(formData.get("phone") || "").trim();
+      const phone = formatPhone(String(formData.get("phone") || "").trim());
+      const phoneDigits = normalizePhoneDigits(phone);
       if (!name || !phone) {
         if (status) status.textContent = "Заполните имя и телефон.";
         return;
+      }
+      if (phoneDigits.length !== 11) {
+        if (status) status.textContent = "Введите корректный телефон.";
+        return;
+      }
+      if (phoneInput instanceof HTMLInputElement) {
+        phoneInput.value = phone;
       }
       if (status) status.textContent = "Отправляем...";
       try {

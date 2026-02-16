@@ -49,6 +49,12 @@ types:
     include_in:
       sitemap: false
       search: false
+  privacy:
+    template: "privacy.html"
+    permalink: "/privacy/"
+    include_in:
+      sitemap: false
+      search: false
 
 links:
   - name: "belongs_to"
@@ -185,6 +191,7 @@ validation:
   single_page_of_type:
     home: 1
     search: 1
+    privacy: 1
   duplicate_route:
     action: "error"
   unknown_type:

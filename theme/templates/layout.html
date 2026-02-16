@@ -99,6 +99,13 @@
           <span>Телефон</span>
           <input type="tel" name="phone" placeholder="+7 (___) ___-__-__" class="input" inputmode="tel" autocomplete="tel" required>
         </label>
+        <label class="consent-field">
+          <input type="checkbox" name="privacy" value="1" class="consent-checkbox" required>
+          <span class="consent-text">
+            Соглашаюсь с
+            <a href="{{ .BaseURL }}/privacy" class="consent-link" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a>
+          </span>
+        </label>
         <button type="submit" class="submitButton">Отправить</button>
         <div class="small-note" data-lead-status>Введите имя и телефон.</div>
       </form>

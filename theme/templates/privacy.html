@@ -1,0 +1,15 @@
+<div class="container-shell">
+  <section class="section-block glass-panel p-6 rounded-3xl space-y-3">
+    <h1 class="text-3xl font-semibold font-display">Политика конфиденциальности</h1>
+    <p class="text-base">Открываем PDF-документ.</p>
+    <p class="text-base">
+      Если переход не произошел автоматически, откройте файл
+      <a class="cta-phone" href="{{ .AssetsBase }}/privacy.pdf" target="_blank" rel="noopener noreferrer">по ссылке</a>.
+    </p>
+  </section>
+</div>
+<script>
+  (function () {
+    window.location.replace("{{ .AssetsBase }}/privacy.pdf");
+  })();
+</script>

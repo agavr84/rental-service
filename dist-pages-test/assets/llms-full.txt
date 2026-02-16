@@ -9,12 +9,12 @@
 - Telegram lead function in `functions/telegram-lead/`
 
 ## Routes
-- Home: https://example.com/
-- Houses: https://example.com/houses/
-- Banyas: https://example.com/banyas/
-- Search: https://example.com/search/
+- Home: /
+- Houses: /houses/
+- Banyas: /banyas/
+- Search: /search/
 
 ## Discovery and indexing
-- Sitemap: https://example.com/sitemap.xml
-- Search JSON: https://example.com/search.json
-- LLM index: https://example.com/llms.txt
+- Sitemap: /sitemap.xml
+- Search JSON: /search.json
+- LLM index: /llms.txt
