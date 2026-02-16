@@ -5,17 +5,10 @@ const MIN_FORM_FILL_MS = Number(process.env.MIN_FORM_FILL_MS || 1500);
 const MAX_FORM_FILL_MS = Number(process.env.MAX_FORM_FILL_MS || 2 * 60 * 60 * 1000);
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60 * 1000);
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 8);
-const DEFAULT_ALLOWED_ORIGINS = [
-  "https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai",
-  "https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai",
-  "https://барскаяусадьба.рф",
-  "https://www.барскаяусадьба.рф",
-];
-const allowedOrigins = (
-  process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(",").map((item) => item.trim())
-    : DEFAULT_ALLOWED_ORIGINS
-).filter(Boolean);
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
 const rateBuckets = new Map();
 
 const sendTelegram = (token, chatId, text) =>
@@ -136,6 +129,25 @@ const sanitizePhone = (value) =>
     .replace(/\s+/g, " ")
     .trim();
 
+const normalizeQueryParams = (value) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const entries = Object.entries(value).slice(0, 15);
+  const out = {};
+  for (const [key, raw] of entries) {
+    const cleanKey = String(key || "")
+      .replace(/[^\w\-.:]/g, "")
+      .slice(0, 64);
+    const cleanValue = String(raw || "")
+      .replace(/[\u0000-\u001F\u007F]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 200);
+    if (!cleanKey || !cleanValue) continue;
+    out[cleanKey] = cleanValue;
+  }
+  return out;
+};
+
 const parseBody = (event) => {
   if (!event.body) return {};
   if (event.body.length > MAX_BODY_BYTES * 2) return {};
@@ -158,6 +170,14 @@ const parseBody = (event) => {
 };
 
 exports.handler = async (event) => {
+  if (!allowedOrigins.length) {
+    return {
+      statusCode: 500,
+      headers: {},
+      body: "Missing ALLOWED_ORIGINS configuration",
+    };
+  }
+
   const origin = getHeader(event.headers, "origin");
   const originAllowed = !!origin && allowedOrigins.includes(origin);
   const corsHeaders = makeCorsHeaders(origin, originAllowed);
@@ -218,6 +238,7 @@ exports.handler = async (event) => {
   const name = sanitizeName(body.name);
   const phone = sanitizePhone(body.phone);
   const phoneDigits = normalizePhoneDigits(phone);
+  const queryParams = normalizeQueryParams(body.queryParams);
 
   if (!name || name.length < 2 || name.length > 80) {
     return {
@@ -246,7 +267,12 @@ exports.handler = async (event) => {
     };
   }
 
-  const text = `Новая заявка\nИмя: ${name}\nТелефон: ${phone}`;
+  const queryText = Object.keys(queryParams).length
+    ? `\nПараметры:\n${Object.entries(queryParams)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("\n")}`
+    : "";
+  const text = `Новая заявка\nИмя: ${name}\nТелефон: ${phone}${queryText}`;
 
   try {
     await sendTelegram(token, chatId, text);

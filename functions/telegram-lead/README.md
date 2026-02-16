@@ -6,12 +6,12 @@ Sends lead form data to Telegram chat.
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
+- `ALLOWED_ORIGINS` - comma-separated list of allowed Origins for CORS.
+  Example:
+  `https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai,https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai,https://agavr84.github.io`
 
 ## Recommended environment variables
 
-- `ALLOWED_ORIGINS` - comma-separated list of allowed Origins for CORS.
-  Example:
-  `https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai,https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai`
 - `MIN_FORM_FILL_MS` - minimum form fill time in ms (default `1500`).
 - `MAX_FORM_FILL_MS` - maximum accepted form age in ms (default `7200000`).
 - `RATE_LIMIT_WINDOW_MS` - rate-limit window in ms (default `60000`).
@@ -29,7 +29,7 @@ yc serverless function version create \
   --memory 128m \
   --execution-timeout 5s \
   --service-account-id <SERVICE_ACCOUNT_ID> \
-  --environment TELEGRAM_BOT_TOKEN=<TOKEN>,TELEGRAM_CHAT_ID=<CHAT_ID> \
+  --environment TELEGRAM_BOT_TOKEN=<TOKEN>,TELEGRAM_CHAT_ID=<CHAT_ID>,ALLOWED_ORIGINS=https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai\\,https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai\\,https://agavr84.github.io \
   --source-path .
 ```
 
@@ -44,4 +44,4 @@ curl -X POST <FUNCTION_URL> \
 ## Notes
 
 - Function handles `OPTIONS` (CORS preflight).
-- Current implementation allows all origins (`*`).
+- Origin is allowed only from values listed in `ALLOWED_ORIGINS`.

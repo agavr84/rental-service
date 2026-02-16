@@ -1,6 +1,19 @@
 (() => {
   const leadEndpoint = document.body?.getAttribute("data-lead-endpoint") || "";
   const leadSuccess = document.body?.getAttribute("data-lead-success") || "Спасибо!";
+  const collectLeadQueryParams = () => {
+    if (!(window.URLSearchParams && window.location && window.location.search)) return {};
+    const params = new URLSearchParams(window.location.search);
+    const out = {};
+    params.forEach((value, key) => {
+      const cleanKey = String(key || "").trim().slice(0, 64);
+      const cleanValue = String(value || "").trim().slice(0, 200);
+      if (!cleanKey || !cleanValue) return;
+      out[cleanKey] = cleanValue;
+    });
+    return out;
+  };
+  const leadQueryParams = collectLeadQueryParams();
   const normalizePhoneDigits = (value) => {
     const digits = String(value || "").replace(/\D/g, "");
     if (!digits) return "";
@@ -194,7 +207,7 @@
         const response = await fetch(leadEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, phone, company, startedAt }),
+          body: JSON.stringify({ name, phone, company, startedAt, queryParams: leadQueryParams }),
         });
         if (!response.ok) {
           throw new Error("Bad response");

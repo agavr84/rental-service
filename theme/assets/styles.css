@@ -1013,6 +1013,21 @@ h3 {
   text-decoration: underline;
 }
 
+.footer .legal {
+  border-top: 1px solid rgba(36, 66, 55, 0.12);
+  margin-top: 0.75rem;
+  padding: 0.9rem 1.5rem 1.1rem;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(36, 66, 55, 0.85);
+}
+
+.footer .legal a {
+  color: #244237;
+  text-decoration: underline;
+}
+
 @media (max-width: 899px) {
   .hero-copy {
     text-align: center;
@@ -1090,6 +1105,11 @@ h3 {
     text-align: center;
     margin-top: 0.25rem;
     padding: 0;
+  }
+
+  .footer .legal {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
