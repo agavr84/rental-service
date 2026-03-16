@@ -1,6 +1,22 @@
 (() => {
   const leadEndpoint = document.body?.getAttribute("data-lead-endpoint") || "";
   const leadSuccess = document.body?.getAttribute("data-lead-success") || "Спасибо!";
+  const yandexMetrikaId = 107716835;
+  const yandexLeadGoal = "отправка формы";
+  const topMailId = 3749765;
+  const topMailLeadGoal = "отправка формы";
+  const trackLeadGoal = () => {
+    try {
+      if (typeof window.ym === "function") {
+        window.ym(yandexMetrikaId, "reachGoal", yandexLeadGoal);
+      }
+    } catch {}
+    try {
+      if (Array.isArray(window._tmr)) {
+        window._tmr.push({ type: "reachGoal", id: topMailId, goal: topMailLeadGoal });
+      }
+    } catch {}
+  };
   const collectLeadQueryParams = () => {
     if (!(window.URLSearchParams && window.location && window.location.search)) return {};
     const params = new URLSearchParams(window.location.search);
@@ -212,6 +228,7 @@
         if (!response.ok) {
           throw new Error("Bad response");
         }
+        trackLeadGoal();
         if (status) status.textContent = leadSuccess;
         form.reset();
         if (startedAtInput instanceof HTMLInputElement) {
