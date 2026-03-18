@@ -11,6 +11,10 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((item) => item.trim())
   .filter(Boolean);
+const telegramChatIds = (process.env.TELEGRAM_CHAT_ID || "")
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
 const rateBuckets = new Map();
 
 const sendTelegram = (token, chatId, text, parseMode = "HTML") =>
@@ -194,8 +198,7 @@ const formatLeadMessage = ({ name, phone, queryParams }) => {
 
 exports.handler = async (event) => {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  const alertChatId = process.env.TELEGRAM_ALERT_CHAT_ID || chatId;
+  const alertChatId = process.env.TELEGRAM_ALERT_CHAT_ID || telegramChatIds[0] || "";
   let errorNotified = false;
   const notifyError = async (title, details = "") => {
     if (errorNotified || !ENABLE_ERROR_REPORTING) return;
@@ -298,7 +301,7 @@ exports.handler = async (event) => {
     };
   }
 
-  if (!token || !chatId) {
+  if (!token || !telegramChatIds.length) {
     await notifyError("Missing Telegram configuration");
     return {
       statusCode: 500,
@@ -310,7 +313,9 @@ exports.handler = async (event) => {
   const text = formatLeadMessage({ name, phone, queryParams });
 
   try {
-    await sendTelegram(token, chatId, text);
+    for (const chatId of telegramChatIds) {
+      await sendTelegram(token, chatId, text);
+    }
     return {
       statusCode: 200,
       headers: corsHeaders,

@@ -1,10 +1,22 @@
 (() => {
   const leadEndpoint = document.body?.getAttribute("data-lead-endpoint") || "";
-  const leadSuccess = document.body?.getAttribute("data-lead-success") || "Спасибо!";
   const yandexMetrikaId = 107716835;
   const yandexLeadGoal = "отправка формы";
   const topMailId = 3749765;
   const topMailLeadGoal = "отправка формы";
+  const thankYouPath = "/thank-you";
+  const toAbsoluteUrl = (path) => {
+    const base = window.__notepubBaseURL || window.location?.origin || "/";
+    try {
+      return new URL(path, base).toString();
+    } catch {
+      return path;
+    }
+  };
+  const isThankYouPage = () => {
+    const pathname = window.location?.pathname || "";
+    return pathname === thankYouPath || pathname === `${thankYouPath}/`;
+  };
   const trackLeadGoal = () => {
     try {
       if (typeof window.ym === "function") {
@@ -17,6 +29,18 @@
       }
     } catch {}
   };
+  if (isThankYouPage()) {
+    try {
+      const current = new URL(window.location.href);
+      if (current.searchParams.get("lead") === "1") {
+        trackLeadGoal();
+        current.searchParams.delete("lead");
+        const cleanQuery = current.searchParams.toString();
+        const cleanPath = cleanQuery ? `${current.pathname}?${cleanQuery}` : current.pathname;
+        window.history.replaceState({}, "", cleanPath);
+      }
+    } catch {}
+  }
   const collectLeadQueryParams = () => {
     if (!(window.URLSearchParams && window.location && window.location.search)) return {};
     const params = new URLSearchParams(window.location.search);
@@ -228,12 +252,7 @@
         if (!response.ok) {
           throw new Error("Bad response");
         }
-        trackLeadGoal();
-        if (status) status.textContent = leadSuccess;
-        form.reset();
-        if (startedAtInput instanceof HTMLInputElement) {
-          startedAtInput.value = String(Date.now());
-        }
+        window.location.assign(toAbsoluteUrl(`${thankYouPath}?lead=1`));
       } catch {
         if (status) status.textContent = "Не удалось отправить. Попробуйте ещё раз.";
       }

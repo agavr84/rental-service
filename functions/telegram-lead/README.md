@@ -5,14 +5,15 @@ Sends lead form data to Telegram chat.
 ## Required environment variables
 
 - `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_CHAT_ID`
+- `TELEGRAM_CHAT_ID` - one or more chat ids, comma-separated.
+  Example: `443746526,1045702289`
 - `ALLOWED_ORIGINS` - comma-separated list of allowed Origins for CORS.
   Example:
   `https://xn--80aaaabdu9b1ckcx4jpb.xn--p1ai,https://www.xn--80aaaabdu9b1ckcx4jpb.xn--p1ai,https://agavr84.github.io`
 
 ## Recommended environment variables
 
-- `TELEGRAM_ALERT_CHAT_ID` - optional chat id for error notifications. If omitted, uses `TELEGRAM_CHAT_ID`.
+- `TELEGRAM_ALERT_CHAT_ID` - optional chat id for error notifications. If omitted, uses the first id from `TELEGRAM_CHAT_ID`.
 - `ENABLE_ERROR_REPORTING` - set to `false` to disable sending endpoint errors to Telegram.
 - `MIN_FORM_FILL_MS` - minimum form fill time in ms (default `1500`).
 - `MAX_FORM_FILL_MS` - maximum accepted form age in ms (default `7200000`).
